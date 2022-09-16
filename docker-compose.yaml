@@ -1,0 +1,30 @@
+version: "3.5"
+x-redash-service: &redash-service
+  image: "redash/redash:10.1.0.b50633"
+  restart: always
+  depends_on:
+    - redis
+  env_file: ./.env.redash
+services:
+  server:
+    <<: *redash-service
+    command: server
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      REDASH_WEB_WORKERS: 3
+  scheduler:
+    <<: *redash-service
+    command: scheduler
+    environment:
+      QUEUES: "celery"
+      WORKERS_COUNT: 1
+  worker:
+    <<: *redash-service
+    command: worker
+    environment:
+      QUEUES: "emails,queries,scheduled_queries,schemas,periodic,default"
+      WORKERS_COUNT: 3
+  redis:
+    image: "redis:6"
+    restart: always
