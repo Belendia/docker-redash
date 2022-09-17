@@ -5,6 +5,8 @@ x-redash-service: &redash-service
   depends_on:
     - redis
   env_file: ./.env.redash
+  extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 services:
   server:
     <<: *redash-service
